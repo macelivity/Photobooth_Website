@@ -1,0 +1,25 @@
+
+###
+GET http://127.0.0.1:5000/images
+Content-Type: application/json
+
+
+###
+GET http://127.0.0.1:5000/images/000023
+Content-Type: image/jpeg
+
+
+###
+POST http://127.0.0.1:5000/images/000023/save
+Content-Type: application/json
+
+{
+    "tag": "grayscale"
+}
+
+
+###
+POST http://127.0.0.1:5000/images/save_image_url
+Content-Type: text/plain
+
+fbg-bremen.de
