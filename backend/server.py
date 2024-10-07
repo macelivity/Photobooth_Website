@@ -28,7 +28,7 @@ logging.basicConfig(filename="backend.log", level=logging.DEBUG)
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 UPLOAD_DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(__file__), '../images'))
-FRONTEND_DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(__file__), '../frontend/build'))
+FRONTEND_DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(__file__), '../build'))
 
 app = Flask(__name__, static_folder=FRONTEND_DIRECTORY, static_url_path='/')
 app.config['UPLOAD_FOLDER'] = UPLOAD_DIRECTORY
