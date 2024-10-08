@@ -1,10 +1,10 @@
+*.log
+*.http
+*.txt
+
 __pycache__/
 .venv/
 **/cache/*
 **/storage/*
 
 frontend/
-
-*.log
-*.http
-*.txt
