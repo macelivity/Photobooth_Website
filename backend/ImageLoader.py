@@ -19,14 +19,14 @@ def get_filename(image_id, tag = None):
 
 
 def get_image_path(image_id):
-    return ROOT_DIRECTORY + "/images/" + get_filename(image_id)
+    return ROOT_DIRECTORY + "images/" + get_filename(image_id)
 
 def get_cache_path(image_id, tag):
-    return ROOT_DIRECTORY + "/backend/cache/" + get_filename(image_id, tag)
+    return ROOT_DIRECTORY + "backend/cache/" + get_filename(image_id, tag)
 
 
 def get_all_image_ids():
-    titles = os.listdir(ROOT_DIRECTORY + "/images")
+    titles = os.listdir(ROOT_DIRECTORY + "images")
     titles.sort(reverse=True)
     #trim title strings to the number - remove "img_" letters and everything after the digits
     ids = [title[3:-4] for title in titles]
@@ -45,7 +45,7 @@ def load_image(image_id):
 
 #occasion has to fit the filename
 def load_overlay(occasion):
-    filepath = ROOT_DIRECTORY + "/backend/overlays/" + occasion + ".png"
+    filepath = ROOT_DIRECTORY + "backend/overlays/" + occasion + ".png"
     overlay = Image.open(filepath)
     return overlay
 
