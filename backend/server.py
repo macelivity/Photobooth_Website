@@ -15,7 +15,7 @@ import Auth
 
 
 RESPONSE_IMAGE_COUNT = 100
-PORT = 8080
+PORT = 8447
 FONT_MAP = {
     #"Helvetica": "Helvetica-Bold.ttf",
     "Helvetica kursiv": "Helvetica-BoldOblique.ttf",
