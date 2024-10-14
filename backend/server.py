@@ -23,6 +23,7 @@ FONT_MAP = {
     "Arathevil": "ArathevilBontegliar.otf",
     "Palace Script": "Palace script.ttf"
 }
+FOTOBOX_URL = "http://91.63.164.147:5050"
 
 
 logging.basicConfig(filename="backend.log", level=logging.DEBUG)
@@ -49,7 +50,7 @@ def try_login():
     if Auth.check_password(password):
         token = Auth.create_new_token()
         response = redirect("/", 200)
-        expiration_time = datetime.now(timezone(timedelta(hours=2))) + timedelta(milliseconds=Auth.TOKEN_LIFETIME)
+        expiration_time = datetime.now(timezone.utc) + timedelta(seconds=Auth.TOKEN_LIFETIME)
         http_expiration_time = expiration_time.strftime('%a, %d %b %Y %H:%M:%S GMT')
         response.headers.add("Set-Cookie", "auth=" + token + "; Expires=" + http_expiration_time)
         logging.info("A user successfully logged in. Token: " + token)
@@ -85,18 +86,14 @@ def get_image(image_id):
     return send_file(filepath, "image/jpg")
 
 
-@app.route("/api/images/<image_id>", strict_slashes=False, methods=['POST'])
-def post_image(image_id):
-    is_authorized = Auth.token_is_admin_authorized(request.cookies.get("auth"))
-    if not is_authorized:
-        return create_unauthorized_response()
-    #TODO: create image from body
-    file = request.files.getlist('files')
-    print(request.files, "....")
-    for f in file:
-        print(f.filename)
-        f.save(os.path.join(app.config['UPLOAD_FOLDER'], f.filename))
-    return "Successfully saved image " + f.filename
+@app.route("/api/images/<image_id>/print", strict_slashes=False, methods=['POST'])
+def print_image(image_id):
+    try:
+        response = requests.post(FOTOBOX_URL + "/printer/order", json={ 'image_id': image_id })
+        return make_response(response.text, response.status_code)
+    except Exception as e:
+        print(e)
+        return make_response("FAILURE", 500)
 
 
 def trim_request_data_to_url(data):
