@@ -3,7 +3,7 @@ import requests
 import json
 from PIL import Image, ImageColor
 from io import BytesIO
-from datetime import datetime, timedelta, UTC
+from datetime import datetime, timedelta, timezone
 import logging
 import os
 import sys
@@ -49,14 +49,9 @@ def try_login():
     if Auth.check_password(password):
         token = Auth.create_new_token()
         response = redirect("/", 200)
-        expiration_time = datetime.now() + timedelta(milliseconds=Auth.TOKEN_LIFETIME)
+        expiration_time = datetime.now(timezone(timedelta(hours=2))) + timedelta(milliseconds=Auth.TOKEN_LIFETIME)
         http_expiration_time = expiration_time.strftime('%a, %d %b %Y %H:%M:%S GMT')
-        auth_token = {
-            "token": token,
-            "expiress": http_expiration_time
-        }
-        response.headers.add("Set-Cookie", "auth=" + token + "; Expires=" + http_expiration_time) 
-        response.set_data(json.dumps(auth_token))
+        response.headers.add("Set-Cookie", "auth=" + token + "; Expires=" + http_expiration_time)
         logging.info("A user successfully logged in. Token: " + token)
         return response
     else:
