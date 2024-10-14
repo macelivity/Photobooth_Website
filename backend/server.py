@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, send_file, make_response, redirect
 import requests
+import json
 from PIL import Image, ImageColor
 from io import BytesIO
 from datetime import datetime, timedelta, UTC
@@ -50,7 +51,12 @@ def try_login():
         response = redirect("/", 200)
         expiration_time = datetime.now() + timedelta(milliseconds=Auth.TOKEN_LIFETIME)
         http_expiration_time = expiration_time.strftime('%a, %d %b %Y %H:%M:%S GMT')
+        auth_token = {
+            "token": token,
+            "expiress": http_expiration_time
+        }
         response.headers.add("Set-Cookie", "auth=" + token + "; Expires=" + http_expiration_time) 
+        response.set_data(json.dumps(auth_token))
         logging.info("A user successfully logged in. Token: " + token)
         return response
     else:
