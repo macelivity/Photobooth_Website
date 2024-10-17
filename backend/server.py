@@ -44,6 +44,24 @@ def create_unauthorized_response():
     return redirect("/login", 302)
 
 
+@app.route("/api/login/printer", strict_slashes=False, methods=['POST'])
+def try_login_printer():
+    password = request.get_data(as_text=True)
+    if Auth.check_password(password):
+        token = Auth.create_new_token()
+        response = make_response()
+        response.staus = 200
+        response.data = token
+        logging.info("A printer successfully logged in. Token: " + token)
+        return response
+    else:
+        logging.info("A user tried to login with the wrong password.")
+        response = make_response()
+        response.status = 401
+        response.data = "Wrong password."
+        return response
+
+
 @app.route("/api/login", strict_slashes=False, methods=['POST'])
 def try_login():
     password = request.get_data(as_text=True)
@@ -123,7 +141,9 @@ def save_image(image_id):
 
     url = trim_request_data_to_url(request.get_data())
     global saved_image_counter
-    image_data = requests.get("http://localhost:{}/images/{}".format(PORT, url)).content
+    print("[URL] http://localhost:{}/api/images/{}".format(PORT, url))
+    image_data = requests.get("http://localhost:{}/api/images/{}".format(PORT, url)).content
+    print(image_data)
     image = Image.open(BytesIO(image_data))
     image.save("storage/img_" + str(image_id) + "_" + str(saved_image_counter) + ".jpg")
     saved_image_counter += 1
@@ -208,6 +228,28 @@ def get_personalized(image_id):
     ImageGenerator.generate_personalized(image_id, text, font, font_size, h_align, v_align, color, filepath)
 
     return send_file(filepath, "image/jpg")
+
+
+@app.route("/api/printer/<path:subpath>", strict_slashes=False, methods=['GET', 'POST'])
+def printer_proxy(subpath):
+    logging.debug("Proxying to printer... [" + request.method + " " + subpath + "]")
+
+    if request.method == 'GET':
+        try:
+            # Accepts only json
+            response = requests.get(FOTOBOX_URL + "/printer/" + subpath)
+            return make_response(response.json(), response.status_code)
+        except Exception as e:
+            print(e)
+            return make_response("FAILURE", 500)
+
+    if request.method == 'POST':
+        try:
+            response = requests.post(FOTOBOX_URL + "/printer/" + subpath, json=request.json)
+            return make_response(response.text, response.status_code)
+        except Exception as e:
+            print(e)
+            return make_response("FAILURE", 500)
 
 
 @app.route("/", strict_slashes=False, methods=['GET'])
