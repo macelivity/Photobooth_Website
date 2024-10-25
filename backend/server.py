@@ -23,14 +23,20 @@ FONT_MAP = {
     "Arathevil": "ArathevilBontegliar.otf",
     "Palace Script": "Palace script.ttf"
 }
-FOTOBOX_URL = "http://91.63.164.147:5050"
+#FOTOBOX_URL = "http://91.63.164.147:5050"
+FOTOBOX_URL = "http://192.168.178.98:5050"
+
+UPLOAD_DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(__file__), '../images'))
+FRONTEND_DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(__file__), '../build'))
 
 
 logging.basicConfig(filename="backend.log", level=logging.DEBUG)
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
-UPLOAD_DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(__file__), '../images'))
-FRONTEND_DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(__file__), '../build'))
+
+global printer_responses
+printer_responses = {}
+
 
 app = Flask(__name__, static_folder=FRONTEND_DIRECTORY, static_url_path='/')
 app.config['UPLOAD_FOLDER'] = UPLOAD_DIRECTORY
@@ -230,6 +236,19 @@ def get_personalized(image_id):
     return send_file(filepath, "image/jpg")
 
 
+
+def tick_printer_response(subpath, method, response_code):
+    global printer_responses
+    key = method + "_" + subpath
+    if not key in printer_responses:
+        printer_responses[key] = {}
+
+    if not response_code in printer_responses[key]:
+        printer_responses[key][response_code] = 1
+    else:
+        printer_responses[key][response_code] = printer_responses[key][response_code] + 1
+
+
 @app.route("/api/printer/<path:subpath>", strict_slashes=False, methods=['GET', 'POST'])
 def printer_proxy(subpath):
     logging.debug("Proxying to printer... [" + request.method + " " + subpath + "]")
@@ -238,18 +257,28 @@ def printer_proxy(subpath):
         try:
             # Accepts only json
             response = requests.get(FOTOBOX_URL + "/printer/" + subpath)
+            tick_printer_response(subpath, "GET", response.status_code)
             return make_response(response.json(), response.status_code)
         except Exception as e:
             print(e)
+            tick_printer_response(subpath, "GET", 500)
             return make_response("FAILURE", 500)
 
     if request.method == 'POST':
         try:
             response = requests.post(FOTOBOX_URL + "/printer/" + subpath, json=request.json)
+            tick_printer_response(subpath, "POST", response.status_code)
             return make_response(response.text, response.status_code)
         except Exception as e:
             print(e)
+            tick_printer_response(subpath, "POST", 500)
             return make_response("FAILURE", 500)
+
+
+@app.route("/api/admin/printer_responses", strict_slashes=False, methods=['GET'])
+def get_printer_responses():
+    global printer_responses
+    return make_response(jsonify(printer_responses), 200)
 
 
 @app.route("/", strict_slashes=False, methods=['GET'])

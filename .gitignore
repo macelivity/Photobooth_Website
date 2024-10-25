@@ -4,8 +4,9 @@
 
 __pycache__/
 .venv/
-**/cache/*
-**/storage/*
+/backend/cache/*
+/backend/storage/*
+/backend/config/secret.conf
 
 frontend/
 

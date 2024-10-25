@@ -7,7 +7,12 @@ import time
 TOKEN_LENGTH = 64
 TOKEN_LIFETIME = 14400  # 4h
 
-HASHED_PASSWORD = "eb2963dd2eb1431b0ad907d188450cdd6c9c127449b2dfdb23f0baaaa2b5b46f"
+SECRET_FILEPATH = "config/secret.conf"
+
+global hashed_password
+
+with open(SECRET_FILEPATH) as secret:
+    hashed_password = secret.read() 
 
 
 global tokens
@@ -17,7 +22,8 @@ tokens = set()
 def check_password(password):
     encoded_password = password.encode('utf-8')
     hash = sha256(encoded_password).hexdigest()
-    return hash == HASHED_PASSWORD
+    global hashed_password
+    return hash == hashed_password
 
 def create_new_token():
     global tokens
