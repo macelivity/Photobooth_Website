@@ -23,8 +23,8 @@ FONT_MAP = {
     "Arathevil": "ArathevilBontegliar.otf",
     "Palace Script": "Palace script.ttf"
 }
-#FOTOBOX_URL = "http://91.63.164.147:5050"
-FOTOBOX_URL = "http://192.168.178.98:5050"
+FOTOBOX_URL = "http://85.16.197.116:5050"
+#FOTOBOX_URL = "http://192.168.178.98:5050"
 
 UPLOAD_DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(__file__), '../images'))
 FRONTEND_DIRECTORY = os.path.abspath(os.path.join(os.path.dirname(__file__), '../build'))
