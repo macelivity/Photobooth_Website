@@ -50,41 +50,29 @@ def create_unauthorized_response():
     return redirect("/login", 302)
 
 
-@app.route("/api/login/printer", strict_slashes=False, methods=['POST'])
-def try_login_printer():
-    password = request.get_data(as_text=True)
-    if Auth.check_password(password):
-        token = Auth.create_new_token()
-        response = make_response()
-        response.staus = 200
-        response.data = token
-        logging.info("A printer successfully logged in. Token: " + token)
-        return response
-    else:
-        logging.info("A user tried to login with the wrong password.")
-        response = make_response()
-        response.status = 401
-        response.data = "Wrong password."
-        return response
-
-
-@app.route("/api/login", strict_slashes=False, methods=['POST'])
+@app.route("/api/login", strict_slashes=False, methods=['GET', 'POST'])
 def try_login():
-    password = request.get_data(as_text=True)
-    if Auth.check_password(password):
-        token = Auth.create_new_token()
-        response = redirect("/", 200)
-        expiration_time = datetime.now(timezone.utc) + timedelta(seconds=Auth.TOKEN_LIFETIME)
-        http_expiration_time = expiration_time.strftime('%a, %d %b %Y %H:%M:%S GMT')
-        response.headers.add("Set-Cookie", "auth=" + token + "; Expires=" + http_expiration_time)
-        logging.info("A user successfully logged in. Token: " + token)
-        return response
-    else:
-        logging.info("A user tried to login with the wrong password.")
-        response = make_response()
-        response.status = 401
-        response.data = "Wrong password."
-        return response
+    if request.method == 'GET':
+        is_authorized = Auth.token_is_authorized(request.cookies.get("auth"))
+        return jsonify({"result": is_authorized}), 200
+
+    if request.method == 'POST':
+        password = request.get_data(as_text=True)
+        if Auth.check_password(password):
+            token = Auth.create_new_token()
+            response = redirect("/", 200)
+            expiration_time = datetime.now(timezone.utc) + timedelta(seconds=Auth.TOKEN_LIFETIME)
+            http_expiration_time = expiration_time.strftime('%a, %d %b %Y %H:%M:%S GMT')
+            response.headers.add("Set-Cookie", "auth=" + token + "; Expires=" + http_expiration_time)
+            logging.info("A user successfully logged in. Token: " + token)
+            return response
+        else:
+            logging.info("A user tried to login with the wrong password.")
+            response = make_response()
+            response.status = 401
+            response.data = "Wrong password."
+            return response
+
 
 
 @app.route("/api/images", strict_slashes=False)
