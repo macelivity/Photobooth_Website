@@ -8,6 +8,7 @@ TOKEN_LENGTH = 64
 TOKEN_LIFETIME = 14400  # 4h
 
 SECRET_FILEPATH = "config/secret.conf"
+AUTH_ACTIVE = False
 
 global hashed_password
 
@@ -20,6 +21,8 @@ tokens = set()
 
 
 def check_password(password):
+    if not AUTH_ACTIVE:
+        return True
     encoded_password = password.encode('utf-8')
     hash = sha256(encoded_password).hexdigest()
     global hashed_password
@@ -36,6 +39,8 @@ def create_new_token():
 
 
 def token_is_authorized(token):
+    if not AUTH_ACTIVE:
+        return True
     global tokens
     return tokens.__contains__(token) and not token == None
 
