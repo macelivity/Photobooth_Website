@@ -22,7 +22,7 @@ def get_image_path(image_id):
     return ROOT_DIRECTORY + "/images/" + get_filename(image_id)
 
 def get_cache_path(image_id, tag):
-    return ROOT_DIRECTORY + "/website/backend/cache/" + get_filename(image_id, tag)
+    return ROOT_DIRECTORY + "/cache/" + get_filename(image_id, tag)
 
 
 def get_all_image_ids():
