@@ -2,8 +2,8 @@ import os
 from PIL import Image
 
 
-#ROOT_DIRECTORY = "/home/photobooth/photobooth"
-ROOT_DIRECTORY = "../"
+ROOT_DIRECTORY = "/home/fotobox/website/"
+#ROOT_DIRECTORY = "../"
 FILENAME_DIGIT_COUNT = 6
 
 
